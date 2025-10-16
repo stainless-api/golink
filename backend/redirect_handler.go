@@ -58,11 +58,25 @@ func (h *redirectHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if len(path) > 1 {
+	// Build the final URL with path segments
+	finalURL := golink.URL
+
+	// Check if URL contains placeholder patterns like {{1}}, {{2}}, etc.
+	hasPlaceholders := strings.Contains(finalURL, "{{")
+
+	if hasPlaceholders {
+		// Replace placeholders with path segments
+		for i := 1; i < len(path); i++ {
+			placeholder := fmt.Sprintf("{{%d}}", i)
+			finalURL = strings.ReplaceAll(finalURL, placeholder, url.QueryEscape(path[i]))
+		}
+	} else if len(path) > 1 {
+		// Legacy behavior: append path segments
 		u.Path = fmt.Sprintf("%s/%s", u.Path, strings.Join(path[1:], "/"))
+		finalURL = u.String()
 	}
 
-	http.Redirect(w, r, u.String(), http.StatusTemporaryRedirect)
+	http.Redirect(w, r, finalURL, http.StatusTemporaryRedirect)
 
 	go h.count(context.Background(), golink.Name)
 }
