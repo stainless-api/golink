@@ -1,16 +1,16 @@
 {
   "manifest_version": 3,
-  "name": "Golink (dev)",
-  "version": "0.0.3",
+  "name": "Stainless golinks",
+  "version": "0.0.1",
 
   "action": {
     "default_popup": "dist/popup.html"
   },
-  "description": "Self-hosted URL shortener. Redirect go/* to registered URLs.",
+  "description": "Stainless internal URL shortener. Redirect go/* to registered URLs.",
   "icons": {},
 
   "author": {
-    "email": "contact@nerdpup.dev"
+    "email": "eric@stainless.com"
   },
 
   "background": {

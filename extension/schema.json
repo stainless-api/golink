@@ -4,7 +4,8 @@
     "golinkInstanceUrl": {
       "title": "Golink instance URL",
       "type": "string",
-      "description": "The URL of your Golink instance, e.g. https://your-golink.an.r.appspot.com."
+      "description": "The URL of your Golink instance, e.g. https://your-golink.an.r.appspot.com.",
+      "default": "https://go.stainless.com"
     }
   }
 }
