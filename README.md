@@ -32,11 +32,24 @@ This builds the console and outputs to `backend/console/`.
 ```shell
 cd extension
 
-# Build both extensions and copy to backend for distribution
-npm run build:firefox && npm run build:release
+# Build Chrome extension
+npm run build:release
+
+# Build Firefox extension (creates unsigned zip)
+npm run build:firefox
 ```
 
-This builds both Chrome (`extension.zip`) and Firefox (`extension-firefox.zip`) versions and copies them to `backend/console/extension/` where they're served at `/setup`.
+**Firefox Extension Signing:**
+
+Firefox requires extensions to be signed. After building:
+
+1. Build the Firefox extension: `npm run build:firefox` (creates `extension-firefox.zip`)
+2. Sign it using one of these methods:
+   - **AMO (Recommended)**: Upload to [addons.mozilla.org](https://addons.mozilla.org/developers/) and download the signed `.xpi`
+   - **web-ext sign**: Use `web-ext sign --api-key=<key> --api-secret=<secret>` (requires [API credentials](https://addons.mozilla.org/developers/addon/api/key/))
+3. Copy the signed `.xpi` to `backend/console/extension/firefox/extension.xpi`
+
+The Chrome extension is automatically copied to `backend/console/extension/chrome/extension.zip` by the build script.
 
 #### Backend Changes
 
@@ -51,11 +64,15 @@ After making changes to any component:
 cd console && npm run build
 
 # Build extensions (if changed)
-cd extension && npm run build:firefox && npm run build:release
+cd extension
+npm run build:release  # Chrome
+npm run build:firefox  # Firefox (then sign and copy .xpi to backend/console/extension/firefox/)
 
 # Deploy everything
 cd backend && gcloud app deploy --quiet
 ```
+
+**Note:** Remember to sign the Firefox extension and manually copy the signed `.xpi` file to `backend/console/extension/firefox/extension.xpi` before deploying.
 
 The deploy uploads:
 - Compiled Go backend
