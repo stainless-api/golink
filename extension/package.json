@@ -12,10 +12,17 @@
     "build:release:schema": "cp schema.json dist/schema.json",
     "build:release:zip": "cd dist && zip ../extension.zip * icons/*",
     "build:release": "npm run build:release:clean && npm run build && npm run build:release:icons && npm run build:release:manifest && npm run build:release:schema && npm run build:release:zip",
+    "build:firefox:clean": "rm -rf dist",
+    "build:firefox:icons": "cp -r icons dist/",
+    "build:firefox:manifest": "cp manifest.firefox.json dist/manifest.json",
+    "build:firefox:schema": "cp schema.json dist/schema.json",
+    "build:firefox:zip": "cd dist && zip ../extension-firefox.zip * icons/*",
+    "build:firefox": "npm run build:firefox:clean && npm run build && npm run build:firefox:icons && npm run build:firefox:manifest && npm run build:firefox:schema && npm run build:firefox:zip",
     "check": "tsc --noEmit"
   },
   "devDependencies": {
     "@types/chrome": "0.0.271",
+    "@types/webextension-polyfill": "^0.12.4",
     "parcel": "2.16.0",
     "process": "0.11.10",
     "typescript": "5.8.2"
@@ -23,6 +30,7 @@
   "dependencies": {
     "@bufbuild/connect": "0.13.0",
     "@bufbuild/connect-web": "0.13.0",
-    "@bufbuild/protobuf": "1.10.1"
+    "@bufbuild/protobuf": "1.10.1",
+    "webextension-polyfill": "^0.12.0"
   }
 }

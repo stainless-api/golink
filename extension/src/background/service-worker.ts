@@ -1,3 +1,4 @@
+import browser from "webextension-polyfill";
 import { addListenerOnGolinkUrlChanged, getGolinkUrl } from "../storage";
 import { updateRedirectRule } from "./updateRedirectRule";
 
@@ -44,5 +45,5 @@ function onInstalled() {
 //   return true;
 // }
 
-chrome.runtime.onInstalled.addListener(onInstalled);
-// chrome.runtime.onStartup.addListener(onStartup);
+browser.runtime.onInstalled.addListener(onInstalled);
+// browser.runtime.onStartup.addListener(onStartup);
