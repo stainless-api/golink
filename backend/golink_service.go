@@ -176,13 +176,6 @@ func (s *golinkService) UpdateGolink(
 	ctx context.Context,
 	req *connect.Request[golinkv1.UpdateGolinkRequest],
 ) (*connect.Response[golinkv1.UpdateGolinkResponse], error) {
-	email, ok := golinkcontext.UserEmailFrom(ctx)
-	if !ok {
-		err := errors.New("user email not found in context")
-		clog.Err(ctx, err)
-		return nil, errf(connect.CodeInternal, "internal error")
-	}
-
 	var o *dto
 
 	err := s.repo.Transaction(ctx, func(ctx context.Context, tx *firestore.Transaction) error {
@@ -193,10 +186,6 @@ func (s *golinkService) UpdateGolink(
 				return errf(connect.CodeNotFound, "go/%s not found", req.Msg.Name)
 			}
 			return errors.Errorf("failed to get Golink(name=%s): %w", req.Msg.Name, err)
-		}
-
-		if !slices.Contains(o.Owners, email) {
-			return errf(connect.CodePermissionDenied, "permission denied")
 		}
 
 		if !isValidURL(req.Msg.Url) {
@@ -230,24 +219,13 @@ func (s *golinkService) DeleteGolink(
 	ctx context.Context,
 	req *connect.Request[golinkv1.DeleteGolinkRequest],
 ) (*connect.Response[golinkv1.DeleteGolinkResponse], error) {
-	email, ok := golinkcontext.UserEmailFrom(ctx)
-	if !ok {
-		err := errors.New("user email not found in context")
-		clog.Err(ctx, err)
-		return nil, errf(connect.CodeInternal, "internal error")
-	}
-
 	err := s.repo.Transaction(ctx, func(ctx context.Context, tx *firestore.Transaction) error {
-		o, err := s.repo.TxGet(ctx, tx, req.Msg.Name)
+		_, err := s.repo.TxGet(ctx, tx, req.Msg.Name)
 		if err != nil {
 			if errors.Is(err, errDocumentNotFound) {
 				return errf(connect.CodeNotFound, "go/%s not found", req.Msg.Name)
 			}
 			return errors.Errorf("failed to get Golink(name=%s): %w", req.Msg.Name, err)
-		}
-
-		if !slices.Contains(o.Owners, email) {
-			return errf(connect.CodePermissionDenied, "permission denied")
 		}
 
 		if err := s.repo.TxDelete(ctx, tx, req.Msg.Name); err != nil {
