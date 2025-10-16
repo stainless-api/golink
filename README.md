@@ -1,181 +1,93 @@
-# Golink (go/link)
+# Stainless Golink
 
-A URL shortener for creating concise, memorable short links, suitable for organization-scoped use, such as in companies or schools.
+Internal URL shortener at https://go.stainless.com
 
-https://github.com/nownabe/golink/assets/1286807/9337f9f8-b3de-40bd-879c-f21b8d441604
+## For Users
 
-## Alternatives
+Visit **https://go.stainless.com/setup** to download and install the browser extension (Chrome recommended).
 
-Considering other options? Here are some similar platforms:
+## For Developers
 
-- [GoLinks® | Knowledge Discovery & Link Management Platform](https://www.golinks.io/)
-- [Trotto - Open-Source Go Links](https://www.trot.to/)
-- [tailscale/golink: A private shortlink service for tailnets](https://github.com/tailscale/golink)
+### Making Changes
 
-Golinks has the following advantages compared to these alternatives:
+The project has three main components:
 
-- **Self-hosted**: You have full control of Golink backend.
-- **Fully-managed**: Golink can be built on fully-managed infrastructure.
-- **Easy to deploy**: You can complete to deploy Golink in just three simple steps.
-- **Cost-effective**: You can get started with Golink at no cost.
-- **No DNS configuration**: Redirect through the Golink Chrome extension.
-- **Chrome extension with [Manifest V3](https://developer.chrome.com/docs/extensions/mv3/intro/)**: Manifest V3 is more secure than V2 and V2 will be end-of-life.
+1. **Backend** (`backend/`) - Go server deployed on App Engine
+2. **Console** (`console/`) - React web UI
+3. **Extension** (`extension/`) - Chrome/Firefox browser extensions
 
-## Golink Origin
+### Development Workflow
 
-Golink originated from Google's internal short links.
-If you are curious about history of go/, dive into the stories on these websites:
-
-- [Golink: A private shortlink service for tailnets | Hacker News](https://news.ycombinator.com/item?id=33978767)
-- [The GoLinks® Blog - The History of Go Links](https://www.golinks.com/blog/go-links-history/)
-- [The Go Links Origin Story: Q&A with Benjamin Staffin · Trotto go links](https://www.trot.to/blog/2020/07/09/go-links-origin-story)
-
-## Usage
-
-### For General Users
-
-Visit **https://go.stainless.com/setup** to download and install the browser extension. The page includes:
-
-- Download links for Chrome and Firefox extensions
-- Step-by-step installation instructions
-- Pre-configured with your Golink instance URL
-
-**Note for Firefox users:** After installation, type `http://go/` once in the address bar to teach Firefox that `go` is a valid hostname.
-
-## Setup for Administrators
-
-### Prerequisites
-
-- [New Google Cloud project](https://cloud.google.com/docs/get-started)
-- [gcloud](https://cloud.google.com/sdk/docs/install) CLI
-
-Additionally, you need to execute the following command:
+#### Console Changes
 
 ```shell
-gcloud auth login
+cd console
+npm run build
 ```
 
-### Configure Your Project
+This builds the console and outputs to `backend/console/`.
 
-Set your project ID:
-
-```shell
-gcloud config set project <YOUR-PROJECT-ID>
-```
-
-### Deploy Applications
-
-Clone this repository:
+#### Extension Changes
 
 ```shell
-git clone https://github.com/nownabe/golink
-cd golink
-```
-
-Run the deploy script. Replace `<REGION>` with one of [App Engine regions](https://cloud.google.com/about/locations#region).
-
-```shell
-./deploy.sh <REGION>
-```
-
-For instance:
-
-```shell
-./deploy.sh us-central1
-```
-
-### Configure Identity-Aware Proxy
-
-Begin by accessing the [Google Cloud Console](https://console.cloud.google.com/apis/credentials/consent) to set up the OAuth consent screen.
-
-1. Choose User Type.
-   - Opt for a user type based on your needs.
-     For exclusive access to members of your organization, select `Internal`.
-     Note: choosing `External` doesn't mean open access.
-     Users can't access your Golink unless you grant explicit permission.
-2. Enter App information
-   - App name: `Golink`
-   - User support email: Your email or a Google Group
-   - Developer contact information: Your email or alternate contact emails
-   - Finish by clicking **SAVE AND CONTINUE**
-3. You don't have to configure scopes.
-
-Proceed to [Identity-Aware Proxy](https://console.cloud.google.com/security/iap).
-Turn on IAP for the App Engine app.
-If you encounter an error status before enabling, you can safely disregard it at this time.
-
-### Add Users
-
-To make Golink accessible to all members of your organization, execute:
-
-```shell
-gcloud iap web add-iam-policy-binding \
-  --role roles/iap.httpsResourceAccessor \
-  --member domain:<YOUR-COMPANY-DOMAIN>
-```
-
-If you prefer to grant access on an individual basis:
-
-```shell
-gcloud iap web add-iam-policy-binding \
-  --role roles/iap.httpsResourceAccessor \
-  --member user:<EMAIL>
-```
-
-You have the option to specify Google Groups too:
-
-```shell
-gcloud iap web add-iam-policy-binding \
-  --role roles/iap.httpsResourceAccessor \
-  --member group:<EMAIL>
-```
-
-Examples:
-
-```shell
-gcloud iap web add-iam-policy-binding \
-  --role roles/iap.httpsResourceAccessor \
-  --member domain:your-company.example.com
-
-gcloud iap web add-iam-policy-binding \
-  --role roles/iap.httpsResourceAccessor \
-  --member user:user1@your-company.example.com
-
-gcloud iap web add-iam-policy-binding \
-  --role roles/iap.httpsResourceAccessor \
-  --member group:group1@your-company.example.com
-```
-
-### Retrieve Your Golink URL
-
-Determine your Golink URL with:
-
-```shell
-echo "https://$(gcloud app describe --format "get(defaultHostname)")"
-```
-
-### Distribute Extensions to Your Organization
-
-Share the setup page with your team: **https://go.stainless.com/setup**
-
-Users can download Chrome and Firefox extensions directly from this page.
-
-#### Self-Hosted Distribution (Recommended)
-
-Extensions are automatically hosted at `/setup` on your Golink instance. Benefits:
-
-- **No review process**: Deploy updates instantly
-- **No fees**: Avoid Chrome Web Store registration costs
-- **Full control**: Manage your own distribution
-
-#### Updating Extensions
-
-```shell
-# Build extensions and copy to backend
 cd extension
-npm run build:firefox && npm run build:release
 
-# Build and deploy
-cd ../console && npm run build
-cd ../backend && gcloud app deploy --quiet
+# Build both extensions and copy to backend for distribution
+npm run build:firefox && npm run build:release
 ```
+
+This builds both Chrome (`extension.zip`) and Firefox (`extension-firefox.zip`) versions and copies them to `backend/console/extension/` where they're served at `/setup`.
+
+#### Backend Changes
+
+Just edit the Go files in `backend/`. No build step needed - Go compiles on deploy.
+
+### Deploying
+
+After making changes to any component:
+
+```shell
+# Build console (if changed)
+cd console && npm run build
+
+# Build extensions (if changed)
+cd extension && npm run build:firefox && npm run build:release
+
+# Deploy everything
+cd backend && gcloud app deploy --quiet
+```
+
+The deploy uploads:
+- Compiled Go backend
+- Built console assets
+- Extension files for self-hosted distribution
+
+### Project Structure
+
+- `backend/` - Go backend with App Engine config
+  - `console/` - Built console assets (generated, not edited directly)
+  - `app.go` - Main application setup
+  - `redirect_handler.go` - Handles go/* redirects
+- `console/` - React app source
+  - `src/pages/` - Page components
+  - `src/router.tsx` - Route configuration
+- `extension/` - Browser extension source
+  - `src/` - TypeScript source
+  - `manifest.json` / `manifest.firefox.json` - Extension configs
+
+### Useful Commands
+
+```shell
+# Deploy backend
+cd backend && gcloud app deploy --quiet
+
+# View logs
+gcloud app logs tail
+
+# Check deployment status
+gcloud app versions list
+```
+
+### Extension Distribution
+
+Extensions are self-hosted at `/setup`. When you deploy, users can download updated versions immediately from https://go.stainless.com/setup - no browser store approval needed.
