@@ -11,13 +11,15 @@
     "build:release:manifest": "cp manifest.release.json dist/manifest.json",
     "build:release:schema": "cp schema.json dist/schema.json",
     "build:release:zip": "cd dist && zip ../extension.zip * icons/*",
-    "build:release": "npm run build:release:clean && npm run build && npm run build:release:icons && npm run build:release:manifest && npm run build:release:schema && npm run build:release:zip",
+    "build:release:copy": "mkdir -p ../backend/console/extension/chrome && cp extension.zip ../backend/console/extension/chrome/",
+    "build:release": "npm run build:release:clean && npm run build && npm run build:release:icons && npm run build:release:manifest && npm run build:release:schema && npm run build:release:zip && npm run build:release:copy",
     "build:firefox:clean": "rm -rf dist",
     "build:firefox:icons": "cp -r icons dist/",
     "build:firefox:manifest": "cp manifest.firefox.json dist/manifest.json",
     "build:firefox:schema": "cp schema.json dist/schema.json",
     "build:firefox:zip": "cd dist && zip ../extension-firefox.zip * icons/*",
-    "build:firefox": "npm run build:firefox:clean && npm run build && npm run build:firefox:icons && npm run build:firefox:manifest && npm run build:firefox:schema && npm run build:firefox:zip",
+    "build:firefox:copy": "mkdir -p ../backend/console/extension/firefox && cp extension-firefox.zip ../backend/console/extension/firefox/extension.xpi",
+    "build:firefox": "npm run build:firefox:clean && npm run build && npm run build:firefox:icons && npm run build:firefox:manifest && npm run build:firefox:schema && npm run build:firefox:zip && npm run build:firefox:copy",
     "check": "tsc --noEmit"
   },
   "devDependencies": {

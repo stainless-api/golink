@@ -36,6 +36,12 @@ class GolinkPopup {
     });
     if (tabs.length > 0 && tabs[0].url) {
       this.currentTabUrl = tabs[0].url;
+
+      // Update description with the URL (bold the URL)
+      const descriptionElem = document.getElementById("description");
+      if (descriptionElem) {
+        descriptionElem.innerHTML = `Add <strong>${this.currentTabUrl}</strong> to golinks`;
+      }
     }
   }
 
