@@ -18,7 +18,8 @@ import UpdateForm from "./UpdateForm";
 import DeleteButton from "./DeleteButton";
 
 export async function editGolinkLoader({ params }: LoaderFunctionArgs) {
-  const name = params.name;
+  // For wildcard routes, the path is in params["*"]
+  const name = params["*"] || params.name || "";
   const golink = (async () => {
     try {
       const resp = await client.getGolink({ name });

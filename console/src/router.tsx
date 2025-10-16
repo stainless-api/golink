@@ -32,7 +32,7 @@ const router = createBrowserRouter(
           errorElement: <RouterErrorDialog />,
         },
         {
-          path: "/:name",
+          path: "/*",
           element: <EditGolink />,
           loader: editGolinkLoader,
           errorElement: <RouterErrorDialog />,
