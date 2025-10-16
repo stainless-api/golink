@@ -12,40 +12,9 @@
         <button class="button" id="open-options">Open Options</button>
       </div>
 
-      <div id="unauthenticated" class="container" hidden>
-        <p>You are not authenticated.</p>
-        <button class="button" id="open-console">Sign in</button>
-      </div>
-
-      <div id="golink-ui" class="container" hidden>
-        <h2 id="tab-title"></h2>
-        <div class="name-wrapper">
-          <span class="name-prefix">go/</span>
-          <input
-            class="name-input"
-            type="text"
-            id="name"
-            name="name"
-            placeholder="golink-name"
-          />
-        </div>
-        <div class="url-wrapper">
-          <span class="url-prefix">to</span>
-          <input
-            class="url-input"
-            type="text"
-            id="url"
-            name="url"
-            placeholder="https://example.com"
-          />
-        </div>
-        <button class="button" id="save">Save</button>
-        <p id="saved" hidden>Saved!</p>
-        <hr />
-        <div id="golinks-container" class="container" hidden>
-          <h2>This URL has the following golinks:</h2>
-          <ul id="golinks"></ul>
-        </div>
+      <div id="configured" class="container" hidden>
+        <p>Manage your golinks through the web console.</p>
+        <button class="button" id="open-console">Open Console</button>
       </div>
     </div>
   </body>
