@@ -27,6 +27,5 @@
     "scripts": ["service-worker.js"]
   },
   "host_permissions": ["http://go/*", "https://go/*"],
-  "options_page": "options.html",
-  "permissions": ["declarativeNetRequest", "storage", "tabs"]
+  "permissions": ["declarativeNetRequest", "tabs"]
 }

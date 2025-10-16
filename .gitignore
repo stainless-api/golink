@@ -1,2 +1,5 @@
 .envrc
 tmp
+.DS_Store
+extension/extension/
+extension/.parcel-cache/

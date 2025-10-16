@@ -1,23 +1,12 @@
 import browser from "webextension-polyfill";
-import { addListenerOnGolinkUrlChanged, getGolinkUrl } from "../storage";
+import { getGolinkUrl } from "../storage";
 import { updateRedirectRule } from "./updateRedirectRule";
 
 async function initialize() {
   console.debug("[initialize] started");
 
   const url = await getGolinkUrl();
-  if (url) {
-    await updateRedirectRule(url);
-  }
-
-  addListenerOnGolinkUrlChanged((newUrl, oldUrl) => {
-    console.debug(`[golinkChanged] newUrl = '${newUrl}', oldUrl = '${oldUrl}'`);
-    (async () => {
-      if (newUrl) {
-        await updateRedirectRule(newUrl);
-      }
-    })();
-  });
+  await updateRedirectRule(url);
 
   console.debug("[initialize] finished");
 }
@@ -36,14 +25,4 @@ function onInstalled() {
   return true;
 }
 
-// function onStartup() {
-//   console.log("[onStartup]");
-//   (async () => {
-//     await initialize();
-//   })();
-
-//   return true;
-// }
-
 browser.runtime.onInstalled.addListener(onInstalled);
-// browser.runtime.onStartup.addListener(onStartup);

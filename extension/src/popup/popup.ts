@@ -2,13 +2,11 @@ import browser from "webextension-polyfill";
 import { getGolinkUrl } from "../storage";
 
 class GolinkPopup {
-  url: string | null;
+  url: string;
+  private currentTabUrl: string | null = null;
 
-  constructor(url: string | null) {
-    this.url = url;
-    if (this.url && !this.url.endsWith("/")) {
-      this.url += "/";
-    }
+  constructor(url: string) {
+    this.url = url.endsWith("/") ? url : url + "/";
   }
 
   public static async create(): Promise<GolinkPopup> {
@@ -17,18 +15,6 @@ class GolinkPopup {
   }
 
   public async initialize() {
-    const notConfiguredElem = document.getElementById("not-configured")!;
-    const configuredElem = document.getElementById("configured")!;
-
-    if (!this.url) {
-      notConfiguredElem.hidden = false;
-      configuredElem.hidden = true;
-      return;
-    }
-
-    notConfiguredElem.hidden = true;
-    configuredElem.hidden = false;
-
     // Get current tab URL to pre-fill
     const tabs = await browser.tabs.query({
       active: true,
@@ -53,8 +39,6 @@ class GolinkPopup {
     }
     browser.tabs.create({ url: consoleUrl });
   };
-
-  private currentTabUrl: string | null = null;
 }
 
 async function initialize() {
