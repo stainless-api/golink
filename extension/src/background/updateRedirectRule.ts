@@ -1,3 +1,4 @@
+import browser from "webextension-polyfill";
 import { getIsFinishedFirstOpen, setIsFinishedFirstOpen } from "../storage";
 
 const ruleId = 1;
@@ -22,27 +23,43 @@ export async function updateRedirectRule(url: string) {
     id: ruleId,
     priority: 1,
     action: {
-      type: "redirect",
+      type: "redirect" as const,
       redirect: {
         transform: { scheme: "https", host: host },
       },
     },
     condition: {
       urlFilter: "*://go/*",
-      resourceTypes: ["main_frame"],
+      resourceTypes: ["main_frame" as const],
+    },
+  };
+
+  // Add a second rule to match paths with content after go/
+  const redirectRuleWithPath = {
+    id: ruleId + 1,
+    priority: 1,
+    action: {
+      type: "redirect" as const,
+      redirect: {
+        transform: { scheme: "https", host: host },
+      },
+    },
+    condition: {
+      urlFilter: "*://go/*/*",
+      resourceTypes: ["main_frame" as const],
     },
   };
 
   const updateRuleOptions = {
-    removeRuleIds: [ruleId],
-    addRules: [redirectRule],
+    removeRuleIds: [ruleId, ruleId + 1],
+    addRules: [redirectRule, redirectRuleWithPath],
   };
   console.debug("[updateRedirectRule] updateRuleOptions", updateRuleOptions);
 
   console.debug(`[updateRedirectRule] updating redirect rule to ${url}`);
-  await chrome.declarativeNetRequest.updateDynamicRules(updateRuleOptions);
+  await browser.declarativeNetRequest.updateDynamicRules(updateRuleOptions);
 
-  // To tell Chrome Browser that http://go/ is a valid url.
+  // To tell the browser that http://go/ is a valid url.
   if (!(await getIsFinishedFirstOpen())) {
     await openGoTab(url);
   }
@@ -58,21 +75,21 @@ async function openGoTab(url: string) {
   }
   const consoleUrl = url + "-/";
 
-  const goTab = await chrome.tabs.create({ url: "http://go/" });
+  const goTab = await browser.tabs.create({ url: "http://go/" });
   console.debug(`[openGoTab] opened http://go/:`, goTab);
 
   const onUpdated = (
     tabId: number,
-    changeInfo: chrome.tabs.TabChangeInfo,
-    tab: chrome.tabs.Tab
+    changeInfo: browser.Tabs.OnUpdatedChangeInfoType,
+    tab: browser.Tabs.Tab
   ) => {
     if (tabId === goTab.id && changeInfo.status === "complete") {
       console.debug("[openGoTab] loading goTab is completed", tab);
 
-      chrome.tabs.remove(tabId);
+      browser.tabs.remove(tabId);
       console.debug("[openGoTab] removed goTab");
 
-      chrome.tabs.onUpdated.removeListener(onUpdated);
+      browser.tabs.onUpdated.removeListener(onUpdated);
       console.debug(`[openGoTab] removed listener`);
 
       if (tab.url === consoleUrl) {
@@ -86,7 +103,7 @@ async function openGoTab(url: string) {
     }
   };
 
-  chrome.tabs.onUpdated.addListener(onUpdated);
+  browser.tabs.onUpdated.addListener(onUpdated);
 
   console.debug(`[openGoTab] finished`);
 }
