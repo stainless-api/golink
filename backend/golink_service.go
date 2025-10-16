@@ -408,9 +408,7 @@ func isValidName(name string) bool {
 	if len(name) > 1500 {
 		return false
 	}
-	if strings.Contains(name, "/") {
-		return false
-	}
+	// Slashes are now allowed - they get encoded to tildes in the document ID
 	if strings.HasPrefix(name, "__") || strings.HasSuffix(name, "__") {
 		return false
 	}

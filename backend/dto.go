@@ -37,5 +37,7 @@ func (o *dto) ToProto() *golinkv1.Golink {
 }
 
 func nameToID(name string) string {
-	return strings.ToLower(name)
+	// Replace slashes with tildes to make names safe for Firestore document IDs
+	// Firestore uses slashes as collection/document path separators
+	return strings.ToLower(strings.ReplaceAll(name, "/", "~"))
 }
