@@ -11,6 +11,7 @@ service GolinkService {
   rpc ListGolinksByUrl(ListGolinksByUrlRequest) returns (ListGolinksByUrlResponse) {}
   rpc ListPopularGolinks(ListPopularGolinksRequest) returns (ListPopularGolinksResponse) {}
   rpc UpdateGolink(UpdateGolinkRequest) returns (UpdateGolinkResponse) {}
+  rpc RenameGolink(RenameGolinkRequest) returns (RenameGolinkResponse) {}
   rpc DeleteGolink(DeleteGolinkRequest) returns (DeleteGolinkResponse) {}
   rpc AddOwner(AddOwnerRequest) returns (AddOwnerResponse) {}
   rpc RemoveOwner(RemoveOwnerRequest) returns (RemoveOwnerResponse) {}
@@ -75,6 +76,15 @@ message UpdateGolinkRequest {
 }
 
 message UpdateGolinkResponse {
+  Golink golink = 1;
+}
+
+message RenameGolinkRequest {
+  string old_name = 1;
+  string new_name = 2;
+}
+
+message RenameGolinkResponse {
   Golink golink = 1;
 }
 

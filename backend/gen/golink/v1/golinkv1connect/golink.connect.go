@@ -50,6 +50,9 @@ const (
 	// GolinkServiceUpdateGolinkProcedure is the fully-qualified name of the GolinkService's
 	// UpdateGolink RPC.
 	GolinkServiceUpdateGolinkProcedure = "/golink.v1.GolinkService/UpdateGolink"
+	// GolinkServiceRenameGolinkProcedure is the fully-qualified name of the GolinkService's
+	// RenameGolink RPC.
+	GolinkServiceRenameGolinkProcedure = "/golink.v1.GolinkService/RenameGolink"
 	// GolinkServiceDeleteGolinkProcedure is the fully-qualified name of the GolinkService's
 	// DeleteGolink RPC.
 	GolinkServiceDeleteGolinkProcedure = "/golink.v1.GolinkService/DeleteGolink"
@@ -70,6 +73,7 @@ type GolinkServiceClient interface {
 	ListGolinksByUrl(context.Context, *connect_go.Request[v1.ListGolinksByUrlRequest]) (*connect_go.Response[v1.ListGolinksByUrlResponse], error)
 	ListPopularGolinks(context.Context, *connect_go.Request[v1.ListPopularGolinksRequest]) (*connect_go.Response[v1.ListPopularGolinksResponse], error)
 	UpdateGolink(context.Context, *connect_go.Request[v1.UpdateGolinkRequest]) (*connect_go.Response[v1.UpdateGolinkResponse], error)
+	RenameGolink(context.Context, *connect_go.Request[v1.RenameGolinkRequest]) (*connect_go.Response[v1.RenameGolinkResponse], error)
 	DeleteGolink(context.Context, *connect_go.Request[v1.DeleteGolinkRequest]) (*connect_go.Response[v1.DeleteGolinkResponse], error)
 	AddOwner(context.Context, *connect_go.Request[v1.AddOwnerRequest]) (*connect_go.Response[v1.AddOwnerResponse], error)
 	RemoveOwner(context.Context, *connect_go.Request[v1.RemoveOwnerRequest]) (*connect_go.Response[v1.RemoveOwnerResponse], error)
@@ -116,6 +120,11 @@ func NewGolinkServiceClient(httpClient connect_go.HTTPClient, baseURL string, op
 			baseURL+GolinkServiceUpdateGolinkProcedure,
 			opts...,
 		),
+		renameGolink: connect_go.NewClient[v1.RenameGolinkRequest, v1.RenameGolinkResponse](
+			httpClient,
+			baseURL+GolinkServiceRenameGolinkProcedure,
+			opts...,
+		),
 		deleteGolink: connect_go.NewClient[v1.DeleteGolinkRequest, v1.DeleteGolinkResponse](
 			httpClient,
 			baseURL+GolinkServiceDeleteGolinkProcedure,
@@ -147,6 +156,7 @@ type golinkServiceClient struct {
 	listGolinksByUrl   *connect_go.Client[v1.ListGolinksByUrlRequest, v1.ListGolinksByUrlResponse]
 	listPopularGolinks *connect_go.Client[v1.ListPopularGolinksRequest, v1.ListPopularGolinksResponse]
 	updateGolink       *connect_go.Client[v1.UpdateGolinkRequest, v1.UpdateGolinkResponse]
+	renameGolink       *connect_go.Client[v1.RenameGolinkRequest, v1.RenameGolinkResponse]
 	deleteGolink       *connect_go.Client[v1.DeleteGolinkRequest, v1.DeleteGolinkResponse]
 	addOwner           *connect_go.Client[v1.AddOwnerRequest, v1.AddOwnerResponse]
 	removeOwner        *connect_go.Client[v1.RemoveOwnerRequest, v1.RemoveOwnerResponse]
@@ -183,6 +193,11 @@ func (c *golinkServiceClient) UpdateGolink(ctx context.Context, req *connect_go.
 	return c.updateGolink.CallUnary(ctx, req)
 }
 
+// RenameGolink calls golink.v1.GolinkService.RenameGolink.
+func (c *golinkServiceClient) RenameGolink(ctx context.Context, req *connect_go.Request[v1.RenameGolinkRequest]) (*connect_go.Response[v1.RenameGolinkResponse], error) {
+	return c.renameGolink.CallUnary(ctx, req)
+}
+
 // DeleteGolink calls golink.v1.GolinkService.DeleteGolink.
 func (c *golinkServiceClient) DeleteGolink(ctx context.Context, req *connect_go.Request[v1.DeleteGolinkRequest]) (*connect_go.Response[v1.DeleteGolinkResponse], error) {
 	return c.deleteGolink.CallUnary(ctx, req)
@@ -211,6 +226,7 @@ type GolinkServiceHandler interface {
 	ListGolinksByUrl(context.Context, *connect_go.Request[v1.ListGolinksByUrlRequest]) (*connect_go.Response[v1.ListGolinksByUrlResponse], error)
 	ListPopularGolinks(context.Context, *connect_go.Request[v1.ListPopularGolinksRequest]) (*connect_go.Response[v1.ListPopularGolinksResponse], error)
 	UpdateGolink(context.Context, *connect_go.Request[v1.UpdateGolinkRequest]) (*connect_go.Response[v1.UpdateGolinkResponse], error)
+	RenameGolink(context.Context, *connect_go.Request[v1.RenameGolinkRequest]) (*connect_go.Response[v1.RenameGolinkResponse], error)
 	DeleteGolink(context.Context, *connect_go.Request[v1.DeleteGolinkRequest]) (*connect_go.Response[v1.DeleteGolinkResponse], error)
 	AddOwner(context.Context, *connect_go.Request[v1.AddOwnerRequest]) (*connect_go.Response[v1.AddOwnerResponse], error)
 	RemoveOwner(context.Context, *connect_go.Request[v1.RemoveOwnerRequest]) (*connect_go.Response[v1.RemoveOwnerResponse], error)
@@ -253,6 +269,11 @@ func NewGolinkServiceHandler(svc GolinkServiceHandler, opts ...connect_go.Handle
 		svc.UpdateGolink,
 		opts...,
 	)
+	golinkServiceRenameGolinkHandler := connect_go.NewUnaryHandler(
+		GolinkServiceRenameGolinkProcedure,
+		svc.RenameGolink,
+		opts...,
+	)
 	golinkServiceDeleteGolinkHandler := connect_go.NewUnaryHandler(
 		GolinkServiceDeleteGolinkProcedure,
 		svc.DeleteGolink,
@@ -287,6 +308,8 @@ func NewGolinkServiceHandler(svc GolinkServiceHandler, opts ...connect_go.Handle
 			golinkServiceListPopularGolinksHandler.ServeHTTP(w, r)
 		case GolinkServiceUpdateGolinkProcedure:
 			golinkServiceUpdateGolinkHandler.ServeHTTP(w, r)
+		case GolinkServiceRenameGolinkProcedure:
+			golinkServiceRenameGolinkHandler.ServeHTTP(w, r)
 		case GolinkServiceDeleteGolinkProcedure:
 			golinkServiceDeleteGolinkHandler.ServeHTTP(w, r)
 		case GolinkServiceAddOwnerProcedure:
@@ -326,6 +349,10 @@ func (UnimplementedGolinkServiceHandler) ListPopularGolinks(context.Context, *co
 
 func (UnimplementedGolinkServiceHandler) UpdateGolink(context.Context, *connect_go.Request[v1.UpdateGolinkRequest]) (*connect_go.Response[v1.UpdateGolinkResponse], error) {
 	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("golink.v1.GolinkService.UpdateGolink is not implemented"))
+}
+
+func (UnimplementedGolinkServiceHandler) RenameGolink(context.Context, *connect_go.Request[v1.RenameGolinkRequest]) (*connect_go.Response[v1.RenameGolinkResponse], error) {
+	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("golink.v1.GolinkService.RenameGolink is not implemented"))
 }
 
 func (UnimplementedGolinkServiceHandler) DeleteGolink(context.Context, *connect_go.Request[v1.DeleteGolinkRequest]) (*connect_go.Response[v1.DeleteGolinkResponse], error) {

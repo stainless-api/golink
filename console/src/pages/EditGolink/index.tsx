@@ -14,6 +14,7 @@ import { CircularProgress } from "@mui/material";
 
 import client from "@/client";
 import { Golink } from "@/gen/golink/v1/golink_pb";
+import RenameForm from "./RenameForm";
 import UpdateForm from "./UpdateForm";
 import DeleteButton from "./DeleteButton";
 
@@ -65,6 +66,10 @@ export default function EditGolink() {
 
               return (
                 <>
+                  <RenameForm golink={golink} />
+                  <Grid xs={12}>
+                    <Divider />
+                  </Grid>
                   <UpdateForm golink={golink} />
                   <Grid xs={12}>
                     <Divider />

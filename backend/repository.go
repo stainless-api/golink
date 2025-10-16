@@ -250,6 +250,49 @@ func (r *repository) TxDelete(ctx context.Context, tx *firestore.Transaction, na
 	return nil
 }
 
+func (r *repository) TxRename(ctx context.Context, tx *firestore.Transaction, oldName string, newName string) (*dto, error) {
+	// Get the old document
+	oldDoc, err := r.TxGet(ctx, tx, oldName)
+	if err != nil {
+		return nil, errors.Errorf("failed to get old document %s: %w", oldName, err)
+	}
+
+	// Check if new name already exists
+	exists, err := r.TxExists(ctx, tx, newName)
+	if err != nil {
+		return nil, errors.Errorf("failed to check if new name exists %s: %w", newName, err)
+	}
+	if exists {
+		return nil, errors.Errorf("new name %s already exists", newName)
+	}
+
+	// Create new document with new name but same data
+	newDoc := &dto{
+		Name:                        newName,
+		URL:                         oldDoc.URL,
+		Owners:                      oldDoc.Owners,
+		RedirectCount28Days:         oldDoc.RedirectCount28Days,
+		RedirectCount7Days:          oldDoc.RedirectCount7Days,
+		RedirectCountCalculatedDate: oldDoc.RedirectCountCalculatedDate,
+		DailyRedirectCounts:         oldDoc.DailyRedirectCounts,
+		CreatedAt:                   oldDoc.CreatedAt,
+		UpdatedAt:                   time.Now(),
+	}
+
+	col := r.collection()
+	newDocRef := col.Doc(newDoc.ID())
+	if err := tx.Create(newDocRef, newDoc); err != nil {
+		return nil, errors.Errorf("failed to create new document %s: %w", newDocRef.Path, err)
+	}
+
+	// Delete old document
+	if err := r.TxDelete(ctx, tx, oldName); err != nil {
+		return nil, errors.Errorf("failed to delete old document %s: %w", oldName, err)
+	}
+
+	return newDoc, nil
+}
+
 func (r *repository) TxAddOwner(ctx context.Context, tx *firestore.Transaction, name string, owner string) error {
 	col := r.collection()
 	doc := col.Doc(nameToID(name))

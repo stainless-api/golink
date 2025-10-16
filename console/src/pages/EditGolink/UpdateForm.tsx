@@ -20,7 +20,6 @@ export default function UpdateForm({ golink }: Props) {
     onUrlUpdateSuccessClose,
     urlUpdateError,
     onUrlUpdateErrorClose,
-    isOwner,
   } = useUrl(golink);
 
   return (
@@ -31,16 +30,11 @@ export default function UpdateForm({ golink }: Props) {
           inputRef={urlRef}
           fullWidth
           defaultValue={golink.url}
-          disabled={!isOwner}
         />
       </Grid>
       <Grid xs={12}>
-        <ProgressButton
-          loading={urlUpdating}
-          onClick={onUrlUpdate}
-          disabled={!isOwner}
-        >
-          Update
+        <ProgressButton loading={urlUpdating} onClick={onUrlUpdate}>
+          Update URL
         </ProgressButton>
       </Grid>
       <Snackbar

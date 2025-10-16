@@ -208,6 +208,46 @@ func (s *golinkService) UpdateGolink(
 	return res, nil
 }
 
+func (s *golinkService) RenameGolink(
+	ctx context.Context,
+	req *connect.Request[golinkv1.RenameGolinkRequest],
+) (*connect.Response[golinkv1.RenameGolinkResponse], error) {
+	if !isValidName(req.Msg.NewName) {
+		return nil, errf(connect.CodeInvalidArgument, "invalid new name")
+	}
+
+	var o *dto
+
+	err := s.repo.Transaction(ctx, func(ctx context.Context, tx *firestore.Transaction) error {
+		var err error
+		o, err = s.repo.TxRename(ctx, tx, req.Msg.OldName, req.Msg.NewName)
+		if err != nil {
+			if errors.Is(err, errDocumentNotFound) {
+				return errf(connect.CodeNotFound, "go/%s not found", req.Msg.OldName)
+			}
+			if strings.Contains(err.Error(), "already exists") {
+				return errf(connect.CodeAlreadyExists, "go/%s already exists", req.Msg.NewName)
+			}
+			return errors.Errorf("failed to rename Golink(old=%s, new=%s): %w", req.Msg.OldName, req.Msg.NewName, err)
+		}
+
+		return nil
+	})
+
+	if connect.CodeOf(err) != connect.CodeUnknown {
+		return nil, err
+	}
+	if err != nil {
+		err := errors.Errorf("rename transaction failed: Golink(old=%s, new=%s): %w", req.Msg.OldName, req.Msg.NewName, err)
+		clog.Err(ctx, err)
+		return nil, errf(connect.CodeInternal, "internal error")
+	}
+
+	res := connect.NewResponse(&golinkv1.RenameGolinkResponse{Golink: o.ToProto()})
+
+	return res, nil
+}
+
 func (s *golinkService) DeleteGolink(
 	ctx context.Context,
 	req *connect.Request[golinkv1.DeleteGolinkRequest],
