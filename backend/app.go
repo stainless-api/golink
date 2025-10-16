@@ -70,6 +70,8 @@ func handler(
 	// https://connectrpc.com/docs/go/routing#prefixing-routes
 	mux.Handle(apiPrefix+"/", http.StripPrefix(apiPrefix, ah))
 	mux.Handle("/health", hh)
+	// Serve extension files as static files
+	mux.Handle("/extension/", http.StripPrefix("/extension/", http.FileServer(http.Dir("console/extension"))))
 	mux.Handle("/", rh)
 
 	h2s := &http2.Server{}
