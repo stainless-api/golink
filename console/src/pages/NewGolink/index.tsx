@@ -16,6 +16,7 @@ import { ConnectError } from "@bufbuild/connect";
 
 type LoaderData = {
   name: string | null;
+  url: string | null;
 };
 
 export async function newGolinkLoader({
@@ -23,12 +24,13 @@ export async function newGolinkLoader({
 }: LoaderFunctionArgs): Promise<LoaderData> {
   const url = new URL(request.url);
   const name = url.searchParams.get("name");
-  return { name };
+  const urlParam = url.searchParams.get("url");
+  return { name, url: urlParam };
 }
 
 export default function NewGolink() {
   const navigate = useNavigate();
-  const { name } = useLoaderData() as LoaderData;
+  const { name, url } = useLoaderData() as LoaderData;
 
   const nameRef = useRef<HTMLInputElement>(null);
   const urlRef = useRef<HTMLInputElement>(null);
@@ -89,7 +91,7 @@ export default function NewGolink() {
           />
         </Grid>
         <Grid xs={12}>
-          <TextField label="URL" inputRef={urlRef} fullWidth />
+          <TextField label="URL" inputRef={urlRef} fullWidth defaultValue={url} />
         </Grid>
         <Grid xs={12}>
           <ProgressButton loading={creating} onClick={onClick}>
