@@ -35,44 +35,60 @@ func (h *redirectHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	golink, err := h.repo.Get(ctx, path[0])
-	if err != nil {
-		if errors.Is(err, errDocumentNotFound) {
-			http.Redirect(w, r, fmt.Sprintf("%s%s", h.consolePrefix, path[0]), http.StatusTemporaryRedirect)
+	// Try to find a golink by checking progressively longer path prefixes
+	// This allows golinks with slashes like "requests/org"
+	var golink *dto
+	var matchedSegments int
+	var err error
+
+	for i := len(path); i > 0; i-- {
+		candidateName := strings.Join(path[:i], "/")
+		golink, err = h.repo.Get(ctx, candidateName)
+		if err == nil {
+			matchedSegments = i
+			break
+		}
+		if !errors.Is(err, errDocumentNotFound) {
+			err := errors.Errorf("failed to get url for %q: %w", candidateName, err)
+			clog.Err(ctx, err)
+			http.Error(w, "internal server error", http.StatusInternalServerError)
 			return
 		}
+	}
 
-		err := errors.Errorf("failed to get url for %q: %w", path[0], err)
-		clog.Err(ctx, err)
-
-		http.Error(w, "internal server error", http.StatusInternalServerError)
+	// No golink found, redirect to console to create it
+	if golink == nil {
+		http.Redirect(w, r, fmt.Sprintf("%s%s", h.consolePrefix, path[0]), http.StatusTemporaryRedirect)
 		return
 	}
+
+	// Remaining path segments after the matched golink name
+	remainingPath := path[matchedSegments:]
 
 	u, err := url.Parse(golink.URL)
 	if err != nil {
-		err := errors.Errorf("failed to parse url (id=%q): %q: %w", path[0], golink.URL, err)
+		err := errors.Errorf("failed to parse url (id=%q): %q: %w", golink.Name, golink.URL, err)
 		clog.Err(ctx, err)
 
 		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
 
-	// Build the final URL with path segments
+	// Build the final URL with remaining path segments
 	finalURL := golink.URL
 
 	// Check if URL contains placeholder patterns like {{1}}, {{2}}, etc.
 	hasPlaceholders := strings.Contains(finalURL, "{{")
 
 	if hasPlaceholders {
-		// Replace placeholders with path segments
-		for i := 1; i < len(path); i++ {
-			placeholder := fmt.Sprintf("{{%d}}", i)
-			finalURL = strings.ReplaceAll(finalURL, placeholder, url.QueryEscape(path[i]))
+		// Replace placeholders with remaining path segments
+		for i := 0; i < len(remainingPath); i++ {
+			placeholder := fmt.Sprintf("{{%d}}", i+1)
+			finalURL = strings.ReplaceAll(finalURL, placeholder, url.QueryEscape(remainingPath[i]))
 		}
-	} else if len(path) > 1 {
-		// Legacy behavior: append path segments
-		u.Path = fmt.Sprintf("%s/%s", u.Path, strings.Join(path[1:], "/"))
+	} else if len(remainingPath) > 0 {
+		// Legacy behavior: append remaining path segments
+		u.Path = fmt.Sprintf("%s/%s", u.Path, strings.Join(remainingPath, "/"))
 		finalURL = u.String()
 	}
 
