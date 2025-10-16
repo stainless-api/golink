@@ -33,8 +33,13 @@ export default function Extensions() {
                 <Button
                   variant="contained"
                   startIcon={<DownloadIcon />}
+                  component="a"
                   href="/extension/chrome/extension.zip"
-                  download
+                  download="extension.zip"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    window.location.href = '/extension/chrome/extension.zip';
+                  }}
                 >
                   Download Chrome Extension
                 </Button>
@@ -76,7 +81,12 @@ export default function Extensions() {
                 <Button
                   variant="contained"
                   startIcon={<DownloadIcon />}
+                  component="a"
                   href="/extension/firefox/extension.xpi"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    window.location.href = '/extension/firefox/extension.xpi';
+                  }}
                 >
                   Install Firefox Extension
                 </Button>
