@@ -25,6 +25,8 @@ export default function EditForm({ golink }: Props) {
   // Track changes to enable/disable save button
   const [nameChanged, setNameChanged] = useState(false);
   const [urlChanged, setUrlChanged] = useState(false);
+  // Track the current name after renames
+  const [currentName, setCurrentName] = useState(golink.name);
 
   const hasChanges = nameChanged || urlChanged;
 
@@ -54,25 +56,30 @@ export default function EditForm({ golink }: Props) {
         if (nameChanged && urlChanged) {
           // Both changed: rename first, then update URL
           await client.renameGolink({
-            oldName: golink.name,
+            oldName: currentName,
             newName: newName,
           });
           await client.updateGolink({
             name: newName,
             url: newUrl,
           });
+          setCurrentName(newName);
+          setNameChanged(false);
+          setUrlChanged(false);
           navigate(`/${newName}`);
         } else if (nameChanged) {
           // Only name changed: just rename
           await client.renameGolink({
-            oldName: golink.name,
+            oldName: currentName,
             newName: newName,
           });
+          setCurrentName(newName);
+          setNameChanged(false);
           navigate(`/${newName}`);
         } else if (urlChanged) {
           // Only URL changed: just update
           await client.updateGolink({
-            name: golink.name,
+            name: currentName,
             url: newUrl,
           });
           setSuccess(true);
@@ -86,7 +93,7 @@ export default function EditForm({ golink }: Props) {
         setSaving(false);
       }
     })();
-  }, [nameRef, urlRef, golink.name, nameChanged, urlChanged, navigate]);
+  }, [nameRef, urlRef, currentName, nameChanged, urlChanged, navigate]);
 
   return (
     <>
@@ -101,7 +108,7 @@ export default function EditForm({ golink }: Props) {
             ),
           }}
           defaultValue={golink.name}
-          onChange={(e) => setNameChanged(e.target.value !== golink.name)}
+          onChange={(e) => setNameChanged(e.target.value !== currentName)}
         />
       </Grid>
       <Grid xs={12}>
