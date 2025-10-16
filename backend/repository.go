@@ -104,6 +104,32 @@ func (r *repository) TxCreate(ctx context.Context, tx *firestore.Transaction, dt
 	return nil
 }
 
+func (r *repository) ListAll(ctx context.Context) ([]*dto, error) {
+	col := r.collection()
+	iter := col.OrderBy("name", firestore.Asc).Documents(ctx)
+	defer iter.Stop()
+
+	var dtos []*dto
+	for {
+		s, err := iter.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			return nil, errors.Errorf("failed to iterate %s: %w", col.Path, err)
+		}
+
+		var o dto
+		if err := s.DataTo(&o); err != nil {
+			return nil, errors.Errorf("failed to populate %s: %w", s.Ref.Path, err)
+		}
+
+		dtos = append(dtos, &o)
+	}
+
+	return dtos, nil
+}
+
 func (r *repository) ListByOwner(ctx context.Context, owner string) ([]*dto, error) {
 	col := r.collection()
 	iter := col.Where("owners", "array-contains", owner).Documents(ctx)

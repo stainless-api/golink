@@ -1,8 +1,8 @@
-import { Typography } from "@mui/material";
+import { TextField, Typography } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import { Helmet } from "react-helmet";
 
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import { Await, defer, useLoaderData } from "react-router-dom";
 import client from "@/client";
 import { Golink } from "@/gen/golink/v1/golink_pb";
@@ -19,22 +19,46 @@ export async function myGolinksLoader() {
 // TODO: Make it type safe (react-router-dom is not type safe now)
 export default function MyGolinks() {
   const { golinks } = useLoaderData() as ReturnType<typeof myGolinksLoader>;
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filterGolinks = (golinks: Golink[]) => {
+    if (!searchQuery) return golinks;
+
+    const query = searchQuery.toLowerCase();
+    return golinks.filter(
+      (golink) =>
+        golink.name.toLowerCase().includes(query) ||
+        golink.url.toLowerCase().includes(query)
+    );
+  };
 
   return (
     <>
       <Helmet>
-        <title>My Golinks | Golink</title>
+        <title>All Golinks | Golink</title>
       </Helmet>
       <Grid container spacing={2}>
         <Grid xs={12}>
           <Typography variant="h5" component="h2">
-            My golinks
+            All golinks
           </Typography>
+        </Grid>
+        <Grid xs={12}>
+          <TextField
+            label="Search golinks"
+            variant="outlined"
+            fullWidth
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search by name or URL..."
+          />
         </Grid>
         <Grid xs={12}>
           <Suspense fallback={<Loading />}>
             <Await resolve={golinks}>
-              {(golinks: Golink[]) => <GolinksList golinks={golinks} />}
+              {(golinks: Golink[]) => (
+                <GolinksList golinks={filterGolinks(golinks)} />
+              )}
             </Await>
           </Suspense>
         </Grid>

@@ -97,14 +97,7 @@ func (s *golinkService) ListGolinks(
 	ctx context.Context,
 	_ *connect.Request[golinkv1.ListGolinksRequest],
 ) (*connect.Response[golinkv1.ListGolinksResponse], error) {
-	email, ok := golinkcontext.UserEmailFrom(ctx)
-	if !ok {
-		err := errors.New("user email not found in context")
-		clog.Err(ctx, err)
-		return nil, errf(connect.CodeInternal, "internal error")
-	}
-
-	dtos, err := s.repo.ListByOwner(ctx, email)
+	dtos, err := s.repo.ListAll(ctx)
 	if err != nil {
 		err := errors.Errorf("failed to list Golinks: %w", err)
 		clog.Err(ctx, err)

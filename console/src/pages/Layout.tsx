@@ -115,7 +115,7 @@ export default function Layout() {
                 <ListItemIcon>
                   <ListIcon />
                 </ListItemIcon>
-                <ListItemText primary="My Golinks" />
+                <ListItemText primary="All Golinks" />
               </ListItemButton>
             </ListItem>
           </List>
