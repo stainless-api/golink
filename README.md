@@ -34,9 +34,13 @@ If you are curious about history of go/, dive into the stories on these websites
 
 ### For General Users
 
-1. Install the [Golink Chrome Extension](https://chrome.google.com/webstore/detail/golink/clecngohjeflemkblbfdfbjkjnigbjok).
-2. Right-click the extension icon and select **Options**.
-3. Input your Golink URL and then click the **Save** button.
+Visit **https://go.stainless.com/setup** to download and install the browser extension. The page includes:
+
+- Download links for Chrome and Firefox extensions
+- Step-by-step installation instructions
+- Pre-configured with your Golink instance URL
+
+**Note for Firefox users:** After installation, type `http://go/` once in the address bar to teach Firefox that `go` is a valid hostname.
 
 ## Setup for Administrators
 
@@ -150,25 +154,28 @@ Determine your Golink URL with:
 echo "https://$(gcloud app describe --format "get(defaultHostname)")"
 ```
 
-Then notify your team members to enter this URL in Golink Chrome Extension Options. Enjoy using golinks!
+### Distribute Extensions to Your Organization
 
-### Distribute Golink extension to your organization
+Share the setup page with your team: **https://go.stainless.com/setup**
 
-You can enforce Golink Chrome extension to be installed in your organization members' browsers.
+Users can download Chrome and Firefox extensions directly from this page.
 
-1. Open https://admin.google.com and navigate to Devices > Chrome > Apps & extensions > Users & browsers.
-2. Click the yellow plus button at the bottom right and then click "add from Chrome Web Store".
-3. Enter `clecngohjeflemkblbfdfbjkjnigbjok` in the "View app by ID" textbox and click the "Select" button.
-4. Set "Permissions and URL access" to "Allow all permissions".
+#### Self-Hosted Distribution (Recommended)
 
-<!--
-4. Configure your Golink URL as JSON like follorings:
+Extensions are automatically hosted at `/setup` on your Golink instance. Benefits:
 
-```js
-{
-  "golinkInstanceUrl": "https://your-golink.an.r.appspot.com"
-}
+- **No review process**: Deploy updates instantly
+- **No fees**: Avoid Chrome Web Store registration costs
+- **Full control**: Manage your own distribution
 
+#### Updating Extensions
 
+```shell
+# Build extensions and copy to backend
+cd extension
+npm run build:firefox && npm run build:release
+
+# Build and deploy
+cd ../console && npm run build
+cd ../backend && gcloud app deploy --quiet
 ```
--->
