@@ -3,3 +3,5 @@ tmp
 .DS_Store
 extension/extension/
 extension/.parcel-cache/
+extension/extension-firefox.zip
+extension/extension.zip

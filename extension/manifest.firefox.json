@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Stainless Golink",
-  "version": "1.0.0",
+  "version": "1.0.1",
 
   "action": {
     "default_popup": "popup.html"
@@ -18,13 +18,13 @@
 
   "browser_specific_settings": {
     "gecko": {
-      "id": "golink@stainless.com",
-      "strict_min_version": "113.0"
+      "id": "golink@stainless.com"
     }
   },
 
   "background": {
-    "scripts": ["service-worker.js"]
+    "scripts": ["service-worker.js"],
+    "type": "module"
   },
   "host_permissions": ["http://go/*", "https://go/*"],
   "permissions": ["declarativeNetRequest", "tabs"]
