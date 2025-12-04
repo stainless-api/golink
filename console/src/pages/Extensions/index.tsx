@@ -106,6 +106,42 @@ export default function Extensions() {
           </Card>
         </Grid>
 
+        <Grid xs={12} md={6}>
+          <Card>
+            <CardContent>
+              <Typography variant="h5" component="h2" gutterBottom>
+                Glide
+              </Typography>
+              <Typography variant="body2" color="text.secondary" paragraph>
+                For Glide browser.
+              </Typography>
+              <Box sx={{ mt: 3 }}>
+                <Typography variant="subtitle2" gutterBottom>
+                  Installation Instructions:
+                </Typography>
+                <Typography variant="body2" paragraph>
+                  Add the following to your Glide config file:
+                </Typography>
+                <Box
+                  component="pre"
+                  sx={{
+                    bgcolor: "grey.100",
+                    p: 2,
+                    borderRadius: 1,
+                    overflow: "auto",
+                    fontSize: "0.875rem",
+                  }}
+                >
+                  <code>
+                    {`glide.prefs.set("xpinstall.signatures.required", false);
+glide.addons.install("https://storage.googleapis.com/stainless-browser-extensions/427d5296db6c-golinks.xpi");`}
+                  </code>
+                </Box>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+
         <Grid xs={12}>
           <Card>
             <CardContent>
