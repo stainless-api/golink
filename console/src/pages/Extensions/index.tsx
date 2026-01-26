@@ -134,6 +134,7 @@ export default function Extensions() {
                 >
                   <code>
                     {`glide.prefs.set("xpinstall.signatures.required", false);
+glide.prefs.set("browser.fixup.domainwhitelist.go", true);
 glide.addons.install("https://storage.googleapis.com/stainless-browser-extensions/427d5296db6c-golinks.xpi");`}
                   </code>
                 </Box>
